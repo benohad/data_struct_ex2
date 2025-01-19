@@ -29,9 +29,9 @@ public:
     }
 
     StatusType arrayResize();
-    unionFindNode<T>* makeSet(T data);
-    unionFindNode<T>* find(unionFindNode<T>* node);
-    bool unionSets(unionFindNode<T>* node1, unionFindNode<T>* node2);
+    std::shared_ptr<unionFindNode<T>> makeSet(T data);
+    std::shared_ptr<unionFindNode<T>> find( std::shared_ptr<unionFindNode<T>> node);
+    bool unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2);
 };
 
 template <class T>
@@ -59,7 +59,7 @@ StatusType UnionFind<T>::arrayResize() {
 }
 
 template <class T>
-unionFindNode<T>* UnionFind<T>::makeSet(T data) {
+std::shared_ptr<unionFindNode<T>> UnionFind<T>::makeSet(T data) {
     // Check if the array is full, and resize if needed.
     if (m_arraySize == m_counter) {
         StatusType resizeStatus = arrayResize();
@@ -81,7 +81,7 @@ unionFindNode<T>* UnionFind<T>::makeSet(T data) {
 }
 
 template <class T>
-unionFindNode<T>* UnionFind<T>::find(unionFindNode<T>* node) {
+std::shared_ptr<unionFindNode<T>> UnionFind<T>::find( std::shared_ptr<unionFindNode<T>> node) {
     // If the node is the root of the tree, return it.
     if (node->parent == nullptr) {
         return node;
@@ -94,7 +94,7 @@ unionFindNode<T>* UnionFind<T>::find(unionFindNode<T>* node) {
 }
 
 template <class T>
-bool UnionFind<T>::unionSets(unionFindNode<T>* node1, unionFindNode<T>* node2) {
+bool UnionFind<T>::unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2) {
     // Find the roots of the trees.
     auto root1 = find(node1);
     auto root2 = find(node2);
