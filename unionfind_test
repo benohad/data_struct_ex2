@@ -1,0 +1,74 @@
+#include <iostream>
+#include "UnionFind.h"
+#include "wet2util.h"  // Make sure this defines StatusType, or remove if not needed
+
+int main() {
+    std::cout << "=== Testing UnionFind ===\n";
+    
+    // 1) Create a UnionFind of integers with an initial data element, for example 1000.
+    UnionFind<int> uf(1000);  
+    // The constructor calls makeSet(1000) internally and stores it at index 0.
+
+    // 2) Create some additional sets
+    auto node1 = uf.makeSet(1);
+    auto node2 = uf.makeSet(2);
+    auto node3 = uf.makeSet(3);
+    auto node4 = uf.makeSet(4);
+
+    // 3) Union a few sets:
+    std::cout << "Union of node1 (data=1) and node2 (data=2)\n";
+    uf.unionSets(node1, node2);
+
+    std::cout << "Union of node2 (data=2) and node3 (data=3)\n";
+    uf.unionSets(node2, node3);
+
+    // Now node1, node2, and node3 should be in the same set.
+    // Let's check their roots:
+    auto root1 = uf.find(node1);
+    auto root2 = uf.find(node2);
+    auto root3 = uf.find(node3);
+
+    if (root1 == root2 && root2 == root3) {
+        std::cout << "Success: node1, node2, and node3 share the same root.\n";
+    } else {
+        std::cout << "Error: node1, node2, and node3 do not share the same root.\n";
+    }
+
+    // 4) Demonstrate a case where unionSets returns false if the elements are already in the same set
+    bool unionAgainResult = uf.unionSets(node1, node3);
+    if (unionAgainResult) {
+        std::cout << "Unexpected: unionSets returned true, but node1 and node3 were already in the same set.\n";
+    } else {
+        std::cout << "Correct: unionSets returned false because node1 and node3 are already in the same set.\n";
+    }
+
+    // 5) Union a separate element (node4) with the big set
+    std::cout << "Union of node3 (data=3) and node4 (data=4)\n";
+    uf.unionSets(node3, node4);
+
+    // Now node4 should share the same root as node1, node2, and node3
+    auto root4 = uf.find(node4);
+    if (uf.find(node1) == root4 && uf.find(node2) == root4 && uf.find(node3) == root4) {
+        std::cout << "Success: node1, node2, node3, and node4 all share the same root now.\n";
+    } else {
+        std::cout << "Error: node4 does not share the same root with node1, node2, and node3.\n";
+    }
+
+    // 6) Also demonstrate the initial (data=1000) element is separate unless we union it too
+    auto initialRoot = uf.find(uf.m_dynamicArray[0].get());  // The node for data=1000
+    if (initialRoot == root4) {
+        std::cout << "Warning: the initial node (1000) is already united with the others.\n";
+    } else {
+        std::cout << "As expected, the initial node (1000) is still separate.\n";
+    }
+
+    // We could union it now:
+    std::cout << "Union of initial node (1000) and node1 (data=1)\n";
+    uf.unionSets(uf.m_dynamicArray[0].get(), node1);
+    if (uf.find(uf.m_dynamicArray[0].get()) == uf.find(node1)) {
+        std::cout << "Now the initial node (1000) is in the same set as node1, node2, node3, node4.\n";
+    }
+
+    std::cout << "\n=== UnionFind Test Completed ===\n";
+    return 0;
+}
