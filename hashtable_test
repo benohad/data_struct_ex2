@@ -1,0 +1,56 @@
+#include <iostream>
+#include "HashTable.h"
+#include "wet2util.h"  // Only if StatusType is defined there; otherwise remove
+
+int main() {
+    std::cout << "=== Testing HashTable Only ===\n";
+
+    // Create a HashTable of integers (key -> integer data).
+    HashTable<int> table;
+
+    // 1) Insert key-data pairs
+    table.insert(1, 10);
+    table.insert(2, 20);
+    table.insert(12, 120);  // Possibly collides with key=2, depending on hash
+
+    // 2) Search for an existing key
+    auto foundNode = table.search(12);
+    if (foundNode != nullptr) {
+        std::cout << "Found key=12 with data=" << foundNode->data << "\n";
+    } else {
+        std::cout << "Could not find key=12 (unexpected)\n";
+    }
+
+    // 3) Search for a non-existing key
+    foundNode = table.search(99);
+    if (foundNode == nullptr) {
+        std::cout << "Could not find key=99 (as expected)\n";
+    } else {
+        std::cout << "Found key=99 unexpectedly\n";
+    }
+
+    // 4) Remove an existing key
+    if (table.remove(1) == StatusType::SUCCESS) {
+        std::cout << "Successfully removed key=1\n";
+    } else {
+        std::cout << "Failed to remove key=1 (unexpected)\n";
+    }
+
+    // 5) Attempt to remove the same key again
+    if (table.remove(1) == StatusType::SUCCESS) {
+        std::cout << "Unexpectedly removed key=1 again\n";
+    } else {
+        std::cout << "Failed to remove key=1 again (as expected)\n";
+    }
+
+    // 6) Verify the key=1 is actually gone by searching
+    foundNode = table.search(1);
+    if (foundNode == nullptr) {
+        std::cout << "Key=1 not found after removal (correct)\n";
+    } else {
+        std::cout << "Error: found key=1 after removal\n";
+    }
+
+    std::cout << "\n=== HashTable Test Completed ===\n";
+    return 0;
+}
