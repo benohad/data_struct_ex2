@@ -5,7 +5,8 @@
 #include "wet2util.h"
 
 const double GOLDEN_RATIO = 0.61803398875;
-const int INITIAL_SIZE = 10;
+const int ARRAY_SIZE = 10;
+
 
 template <class T>
 struct HashNode {
@@ -23,9 +24,9 @@ public:
     //array of unique pointers to shared pointers(the nodes inside a chain)
     std::unique_ptr<std::shared_ptr<HashNode<T>>[]> m_dynamicArray;
 
-     HashTable() : m_tableSize(INITIAL_SIZE), m_counter(0) {
+     HashTable() : m_tableSize(ARRAY_SIZE), m_counter(0) {
         m_dynamicArray = std::unique_ptr<std::shared_ptr<HashNode<T>>[]>
-                (new std::shared_ptr<HashNode<T>>[INITIAL_SIZE]);
+                (new std::shared_ptr<HashNode<T>>[ARRAY_SIZE]);
     }
 
     int hashFunction(int key);
