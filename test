@@ -1,0 +1,93 @@
+#include <iostream>
+#include "wet2util.h"       // Make sure this defines StatusType if needed
+#include "HashTable.h"
+#include "UnionFind.h"
+
+int main() {
+    std::cout << "=== Testing HashTable ===\n";
+    
+    // Create a HashTable of integers (key -> integer data)
+    HashTable<int> table;
+    
+    // Insert some key-data pairs
+    table.insert(1, 10);
+    table.insert(2, 20);
+    table.insert(12, 120);  // Will collide with key=2 if hashFunction(12) == hashFunction(2) in your scheme
+
+    // Search for an existing key
+    auto foundNode = table.search(12);
+    if (foundNode != nullptr) {
+        std::cout << "Found key=12 with data=" << foundNode->data << "\n";
+    } else {
+        std::cout << "Could not find key=12\n";
+    }
+
+    // Search for a non-existing key
+    foundNode = table.search(99);
+    if (foundNode != nullptr) {
+        std::cout << "Found key=99 with data=" << foundNode->data << "\n";
+    } else {
+        std::cout << "Could not find key=99\n";
+    }
+
+    // Remove an existing key
+    if (table.remove(1) == StatusType::SUCCESS) {
+        std::cout << "Successfully removed key=1\n";
+    } else {
+        std::cout << "Failed to remove key=1\n";
+    }
+
+    // Try removing the same key again
+    if (table.remove(1) == StatusType::SUCCESS) {
+        std::cout << "Successfully removed key=1 again (unexpected)\n";
+    } else {
+        std::cout << "Failed to remove key=1 again (as expected)\n";
+    }
+
+    // Verify removal by searching again
+    foundNode = table.search(1);
+    if (foundNode != nullptr) {
+        std::cout << "Found key=1 with data=" << foundNode->data << " (unexpected)\n";
+    } else {
+        std::cout << "Key=1 not found (as expected after removal)\n";
+    }
+
+    //===========================================================
+    std::cout << "\n=== Testing UnionFind ===\n";
+    
+    // Create a UnionFind of integers with an initial data element (e.g. 1000).
+    UnionFind<int> uf(1000);  
+    // The constructor already did makeSet(1000) internally.
+
+    // Make some additional sets
+    auto node1 = uf.makeSet(1);
+    auto node2 = uf.makeSet(2);
+    auto node3 = uf.makeSet(3);
+
+    // Union some sets
+    uf.unionSets(node1, node2);
+    uf.unionSets(node2, node3);
+
+    // Now node1, node2, and node3 should be in the same set.
+    // Let's check their roots:
+    auto root1 = uf.find(node1);
+    auto root2 = uf.find(node2);
+    auto root3 = uf.find(node3);
+
+    // If they're all in the same set, root1, root2, and root3 will be the same pointer.
+    if (root1 == root2 && root2 == root3) {
+        std::cout << "node1, node2, and node3 are in the same set (as expected)\n";
+    } else {
+        std::cout << "Union-Find error: they are not in the same set\n";
+    }
+
+    // We can also union with the initial node (the one holding '1000')
+    // The first element (made in the constructor) is at index 0 => uf.m_dynamicArray[0].
+    // But to be safe, let's just demonstrate with node1 for simplicity:
+    auto initialRoot = uf.find(uf.m_dynamicArray[0].get());
+    uf.unionSets(initialRoot, node1);
+    // Now everything should be in one set, but we won't belabor the point.
+
+    std::cout << "=== Test Completed ===\n";
+    return 0;
+}
