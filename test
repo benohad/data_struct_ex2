@@ -1,14 +1,14 @@
 #include <iostream>
 #include "wet2util.h"       // Make sure this defines StatusType if needed
 #include "HashTable.h"
-#include "UnionFind.h"
+#include "Union_find.h"
 
 int main() {
     std::cout << "=== Testing HashTable ===\n";
-    
+
     // Create a HashTable of integers (key -> integer data)
     HashTable<int> table;
-    
+
     // Insert some key-data pairs
     table.insert(1, 10);
     table.insert(2, 20);
@@ -54,9 +54,9 @@ int main() {
 
     //===========================================================
     std::cout << "\n=== Testing UnionFind ===\n";
-    
+
     // Create a UnionFind of integers with an initial data element (e.g. 1000).
-    UnionFind<int> uf(1000);  
+    UnionFind<int> uf(1000);
     // The constructor already did makeSet(1000) internally.
 
     // Make some additional sets
@@ -84,7 +84,7 @@ int main() {
     // We can also union with the initial node (the one holding '1000')
     // The first element (made in the constructor) is at index 0 => uf.m_dynamicArray[0].
     // But to be safe, let's just demonstrate with node1 for simplicity:
-    auto initialRoot = uf.find(uf.m_dynamicArray[0].get());
+    auto initialRoot = uf.find(uf.m_dynamicArray[0]);
     uf.unionSets(initialRoot, node1);
     // Now everything should be in one set, but we won't belabor the point.
 
