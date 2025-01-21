@@ -30,7 +30,7 @@ public:
     StatusType arrayResize();
     std::shared_ptr<unionFindNode<T>> makeSet(T data);
     std::shared_ptr<unionFindNode<T>> find( std::shared_ptr<unionFindNode<T>> node);
-    bool unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2);
+    std::shared_ptr<unionFindNode<T>> unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2);
 };
 
 template <class T>
@@ -93,22 +93,25 @@ std::shared_ptr<unionFindNode<T>> UnionFind<T>::find( std::shared_ptr<unionFindN
 }
 
 template <class T>
-bool UnionFind<T>::unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2) {
+std::shared_ptr<unionFindNode<T>> UnionFind<T>::unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::shared_ptr<unionFindNode<T>> node2) {
     // Find the roots of the trees.
     auto root1 = find(node1);
     auto root2 = find(node2);
 
     // If the roots are the same, return false.
     if (root1 == root2) {
-        return false;
+        return nullptr;
     }
     if(root1->size < root2->size){
         root1->parent = root2;
         root2->size += root1->size;
+        return root2;
+
     } else{
         root2->parent = root1;
         root1->size += root2->size;
     }
+    return root1;
 }
 
 #endif //EX_2_UNIONFIND_H
