@@ -31,7 +31,7 @@ public:
 
     int hashFunction(int key);
     StatusType insert(int key, T data);
-    StatusType remove(int key);
+    StatusType remove(int key,T data);
     std::shared_ptr<HashNode<T>> search(int key);
     StatusType arrayResize();
 };
@@ -96,7 +96,7 @@ StatusType HashTable<T>::arrayResize() {
 }
 
 template <class T>
-StatusType HashTable<T>::remove(int key) {
+StatusType HashTable<T>::remove(int key,T data) {
     int index = hashFunction(key);
     std::shared_ptr<HashNode<T>> current = m_dynamicArray[index];
 
@@ -106,7 +106,7 @@ StatusType HashTable<T>::remove(int key) {
     }
 
     // If the first node is the node to remove.
-    if (current->key == key) {
+    if (current->key == key && current->data == data) {
         // if it is the first node in the chain the next is nullptr...
         m_dynamicArray[index] = current->next;
         m_counter--;
@@ -115,7 +115,7 @@ StatusType HashTable<T>::remove(int key) {
 
     // Traverse the chain to find the node to remove.
     while (current->next != nullptr) {
-        if (current->next->key == key) {
+        if (current->next->key == key&& current->next->data == data) {
             // Found the node, remove it from the chain.
             current->next = current->next->next;
             m_counter--;
