@@ -1,5 +1,5 @@
-#ifndef EX_2_UNION_FIND_H
-#define EX_2_UNION_FIND_H
+#ifndef EX_2_UNIONFIND_H
+#define EX_2_UNIONFIND_H
 
 #include <memory>
 #include "wet2util.h"
@@ -21,11 +21,10 @@ public:
     int m_counter;
     //array of unique pointers to shared pointers
     std::unique_ptr<std::shared_ptr<unionFindNode<T>>[]> m_dynamicArray;
-
-    explicit UnionFind(T data) : m_arraySize(INITIAL_SIZE), m_counter(0) {
+// changed from UnionFind(T data)+ makeSet(data) to ().
+     UnionFind() : m_arraySize(INITIAL_SIZE), m_counter(0) {
         m_dynamicArray = std::unique_ptr<std::shared_ptr<unionFindNode<T>>[]>
                 (new std::shared_ptr<unionFindNode<T>>[INITIAL_SIZE]);
-        makeSet(data);
     }
 
     StatusType arrayResize();
@@ -112,4 +111,4 @@ bool UnionFind<T>::unionSets( std::shared_ptr<unionFindNode<T>> node1,  std::sha
     }
 }
 
-#endif //EX_2_UNION_FIND_H
+#endif //EX_2_UNIONFIND_H
