@@ -33,6 +33,8 @@ private:
     HashTable <gameNode> jockeyTable;
     HashTable <gameNode> teamTable;
     UnionFind <gameNode> gameUnion;
+    //key is the record , value: is the team id  to the team node
+    HashTable<int> teamRecord;
 
 
 public:
