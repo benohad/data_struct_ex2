@@ -24,7 +24,7 @@ public:
     //array of unique pointers to shared pointers(the nodes inside a chain)
     std::unique_ptr<std::shared_ptr<HashNode<T>>[]> m_dynamicArray;
 
-     HashTable() : m_tableSize(ARRAY_SIZE), m_counter(0) {
+    HashTable() : m_tableSize(ARRAY_SIZE), m_counter(0) {
         m_dynamicArray = std::unique_ptr<std::shared_ptr<HashNode<T>>[]>
                 (new std::shared_ptr<HashNode<T>>[ARRAY_SIZE]);
     }
@@ -44,8 +44,12 @@ int HashTable<T>::hashFunction(int key) {
 template <class T>
 StatusType HashTable<T>::insert(int key, T data) {
     // Check if the array needs to be resized =>> alpha factor is 2.
+    try{
     if (m_counter >= 2*m_tableSize) {
         return arrayResize();
+    }
+    } catch (std::bad_alloc&) {
+        return StatusType::ALLOCATION_ERROR;
     }
 
     int index = hashFunction(key);
