@@ -102,6 +102,7 @@ std::shared_ptr<unionFindNode<T>> UnionFind<T>::unionSets( std::shared_ptr<union
     if (root1 == root2) {
         return nullptr;
     }
+
     if(root1->size < root2->size){
         root1->parent = root2;
         root2->size += root1->size;
