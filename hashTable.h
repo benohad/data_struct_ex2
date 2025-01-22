@@ -3,6 +3,9 @@
 #define EX_2_HASHTABLE_H
 #include <memory>
 #include "wet2util.h"
+#include <iostream>
+
+
 
 const double GOLDEN_RATIO = 0.61803398875;
 const int ARRAY_SIZE = 10;
