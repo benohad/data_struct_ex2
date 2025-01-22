@@ -26,8 +26,8 @@ private:
     struct gameNode{
         int m_Id;
         int m_record;
-        int location;
-       explicit gameNode(int id): m_Id(id), m_record(0),location(-1){}
+        int m_location;
+       explicit gameNode(int id): m_Id(id), m_record(0),m_location(-1){}
     };
 
     HashTable <gameNode> jockeyTable;
@@ -35,6 +35,7 @@ private:
     UnionFind <gameNode> gameUnion;
     //key is the record , value: is the team id  to the team node
     HashTable<int> teamRecord;
+    HashTable<int> teamRecordNeg;
 
 
 public:
