@@ -78,41 +78,47 @@ StatusType Plains::update_match(int victoriousJockeyId, int losingJockeyId)
     // End of checking validity
 
 
-
     // delete the records of the jockeys from the team record hash table
     int victoriousTeamRecord = victoriousTeam->data.m_record;
     int losingTeamRecord = losingTeam->data.m_record;
     if(victoriousTeamRecord>=0) {
         teamRecord.remove(victoriousTeamRecord, victoriousTeamId);
-        std::cout<<"------- flag 1, winning record is: "<< victoriousTeam->data.m_record<< std::endl;
+       // std::cout<<"------- flag 1, winning record is: "<< victoriousTeam->data.m_record<< std::endl;
     }
     else {
         teamRecordNeg.remove(-victoriousTeamRecord, victoriousTeamId);
-        std::cout<<" flag 2"<<std::endl;
+       // std::cout<<" flag 2"<<std::endl;
     }
     if(losingTeamRecord>=0) {
         teamRecord.remove(losingTeamRecord, losingTeamId);
-        std::cout<<" ------flag 3, the record is: "<< losingTeam->data.m_record<< std::endl;
+      //  std::cout<<" ------flag 3, the record is: "<< losingTeam->data.m_record<< std::endl;
     }
     else {
         teamRecordNeg.remove(-losingTeamRecord, losingTeamId);
-        std::cout<<" flag 4"<<std::endl;
+       // std::cout<<" flag 4"<<std::endl;
     }
 
     // update the records of the jockeys
     victoriousJockey->data.m_record++;
     losingJockey->data.m_record--;
 
+    //update the record of the union find nodes of the team
+    victoriousTeam->data.m_record++;
+    losingTeam->data.m_record--;
+
+
+
 
     //update the team records in the team hash table+ // update the team record hash table
     teamTable.search(victoriousTeamId)->data.m_record++;
-   // std::cout<<"victorious team id: "<<victoriousTeamId<<std::endl;
     victoriousTeamRecord = teamTable.search(victoriousTeamId)->data.m_record;
-
+   // std::cout<<"-------victorious team id: "<<victoriousTeamId<<std::endl;
+ //   std::cout<<"-------victorious team record: "<<victoriousTeamRecord<<std::endl;
 
     teamTable.search(losingTeamId)->data.m_record--;
     losingTeamRecord = teamTable.search(losingTeamId)->data.m_record;
-
+ //   std::cout<<"-------losing team id: "<<losingTeamId<<std::endl;
+  //  std::cout<<"-------losing team record: "<<losingTeamRecord<<std::endl;
 
     if(victoriousTeamRecord>=0) {
         teamRecord.insert(victoriousTeamRecord, victoriousTeamId);
@@ -152,7 +158,6 @@ StatusType Plains::merge_teams(int teamId1, int teamId2)
     int newTeamId = team1->data.m_record>team2->data.m_record?team1->data.m_Id:team2->data.m_Id;
 
     // delete the records of the teams from the team record hash table
-
         if (team2->data.m_record >= 0)
             teamRecord.remove(team2->data.m_record, team2->data.m_Id);
         else
@@ -205,7 +210,7 @@ StatusType Plains::unite_by_record(int record)
         return StatusType::FAILURE;
     }
     if(team1->next||team2->next) {
-        std::cout<<"more than one team with the same record"<<std::endl;
+     //   std::cout<<"more than one team with the same record"<<std::endl;
         return StatusType::FAILURE;
     }
     int teamId1 = team1->data;
