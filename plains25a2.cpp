@@ -25,6 +25,8 @@ StatusType Plains::add_team(int teamId)
 
     // insert the team to the union find
    if (gameUnion.makeSet(gameNode(teamId))==nullptr) return StatusType::ALLOCATION_ERROR;
+
+
     return status;
 }
 
@@ -35,21 +37,33 @@ StatusType Plains::add_jockey(int jockeyId, int teamId)
     // check if the jockey or team are already exists
     if(jockeyTable.search(jockeyId) != nullptr||teamTable.search(teamId) == nullptr )
         return StatusType::FAILURE;
+
+    //check the m_valid flag of the team
+    if (!teamTable.search(teamId)->data.m_valid) return StatusType::FAILURE;
+
+
     // insert the jockey to the table data is record
     gameNode jockeyNode(jockeyId);
+
     try {
     jockeyTable.insert(jockeyId,jockeyNode);
     } catch (std::bad_alloc&) {
         return StatusType::ALLOCATION_ERROR;
     }
+
+
   // update the jockey location on the hash table array
-    jockeyTable.search(jockeyId)->data.m_location=gameUnion.m_counter;
+ if(jockeyTable.search(jockeyId)) {
+     jockeyTable.search(jockeyId)->data.m_location = gameUnion.m_counter;
+ }
     // insert the jockey to the union find -jockey is a game node.
     if (gameUnion.makeSet(gameNode(jockeyId))==nullptr) return StatusType::ALLOCATION_ERROR;
 
     //update the parent of the jockey to be the team
-    gameUnion.m_dynamicArray[jockeyTable.search(jockeyId)->data.m_location]->parent =
-            gameUnion.m_dynamicArray[teamTable.search(teamId)->data.m_location];
+        gameUnion.m_dynamicArray[jockeyTable.search(jockeyId)->data.m_location]->parent =
+                  gameUnion.m_dynamicArray[teamTable.search(teamId)->data.m_location];
+
+
 
     return StatusType::SUCCESS;
 }
@@ -150,12 +164,22 @@ StatusType Plains::merge_teams(int teamId1, int teamId2)
     if(team1 == nullptr || team2 == nullptr)
         return StatusType::FAILURE;
 
+    // check if the teams are valid
+    if (!team1->data.m_valid || !team2->data.m_valid) return StatusType::FAILURE;
+
 // the roots of the teams
     auto gameNode1 = gameUnion.m_dynamicArray[team1->data.m_location];
     auto gameNode2 = gameUnion.m_dynamicArray[team2->data.m_location];
 
     // the id of the team with the bigger record will be the id of the new team
-    int newTeamId = team1->data.m_record>team2->data.m_record?team1->data.m_Id:team2->data.m_Id;
+    int newTeamId = team1->data.m_record>=team2->data.m_record?team1->data.m_Id:team2->data.m_Id;
+
+    if(newTeamId==team1->data.m_Id) {
+        team2->data.m_valid = false;
+    }
+    else {
+        team1->data.m_valid = false;
+    }
 
     // delete the records of the teams from the team record hash table
         if (team2->data.m_record >= 0)
@@ -168,15 +192,19 @@ StatusType Plains::merge_teams(int teamId1, int teamId2)
         else
             teamRecordNeg.remove(-(team1->data.m_record), team1->data.m_Id);
 
-      //  teamRecord.remove(team1->data.m_record,team1->data.m_Id);
+
     // if they have the same record the id of the first team will be the new team id
-    if(team1->data.m_record==team2->data.m_record)
+    if(team1->data.m_record==team2->data.m_record) {
         newTeamId = team1->data.m_Id;
+        team2->data.m_valid = false;
+    }
 
     //unite the teams
     auto new_root = (gameUnion.unionSets(gameNode1,gameNode2));
     // update the new_root id to be the new team id
     new_root->data.m_Id = newTeamId;
+
+
 
 
 
@@ -209,10 +237,19 @@ StatusType Plains::unite_by_record(int record)
     if(team1 == nullptr || team2 == nullptr) {
         return StatusType::FAILURE;
     }
-    if(team1->next||team2->next) {
-     //   std::cout<<"more than one team with the same record"<<std::endl;
+
+    if(!teamRecord.Singleton(record) || !teamRecordNeg.Singleton(record)) {
         return StatusType::FAILURE;
     }
+    /*if(team1->next||team2->next) {
+     //   std::cout<<"more than one team with the same record"<<std::endl;
+        return StatusType::FAILURE;
+    }*/
+
+    //check validity of the teams
+    if (!teamTable.search(team1->data)->data.m_valid || !teamTable.search(team2->data)->data.m_valid)
+        return StatusType::FAILURE;
+
     int teamId1 = team1->data;
     int teamId2 = team2->data;
 
@@ -244,6 +281,10 @@ output_t<int> Plains::get_team_record(int teamId)
     auto team = teamTable.search(teamId);
     if(team == nullptr)
         return StatusType::FAILURE;
+
+    // check if the team is valid
+    if (!team->data.m_valid) return StatusType::FAILURE;
+
     int record = team->data.m_record;
     return output_t<int>(record);
 
