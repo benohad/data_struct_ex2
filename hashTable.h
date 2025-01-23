@@ -37,6 +37,7 @@ public:
     StatusType remove(int key,T data);
     std::shared_ptr<HashNode<T>> search(int key);
     StatusType arrayResize();
+    bool Singleton(int key);
 };
 
 template <class T>
@@ -48,7 +49,7 @@ template <class T>
 StatusType HashTable<T>::insert(int key, T data) {
     // Check if the array needs to be resized =>> alpha factor is 2.
     try{
-    if (m_counter >= 2*m_tableSize) {
+    if (m_counter >= 7000*m_tableSize) {
         return arrayResize();
     }
     } catch (std::bad_alloc&) {
@@ -146,6 +147,16 @@ std::shared_ptr<HashNode<T>> HashTable<T>::search(int key) {
 
     // if we didn't find the node
     return nullptr;
+}
+
+template <class T>
+bool HashTable<T>:: Singleton(int key){
+    int index = hashFunction(key);
+    std::shared_ptr<HashNode<T>> current = m_dynamicArray[index];
+    if (current == nullptr) {
+        return false;
+    }
+    return current->next == nullptr;
 }
 
 
