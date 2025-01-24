@@ -21,10 +21,10 @@ StatusType Plains::add_team(int teamId)
     StatusType status = teamTable.insert(teamId,teamNode);
 
     // update the team location on the hash table array
-   teamTable.search(teamId)->data.m_location=gameUnion.m_counter;
+    teamTable.search(teamId)->data.m_location=gameUnion.m_counter;
 
     // insert the team to the union find
-   if (gameUnion.makeSet(gameNode(teamId))==nullptr) return StatusType::ALLOCATION_ERROR;
+    if (gameUnion.makeSet(gameNode(teamId))==nullptr) return StatusType::ALLOCATION_ERROR;
 
 
     return status;
@@ -46,22 +46,22 @@ StatusType Plains::add_jockey(int jockeyId, int teamId)
     gameNode jockeyNode(jockeyId);
 
     try {
-    jockeyTable.insert(jockeyId,jockeyNode);
+        jockeyTable.insert(jockeyId,jockeyNode);
     } catch (std::bad_alloc&) {
         return StatusType::ALLOCATION_ERROR;
     }
 
 
-  // update the jockey location on the hash table array
- if(jockeyTable.search(jockeyId)) {
-     jockeyTable.search(jockeyId)->data.m_location = gameUnion.m_counter;
- }
+    // update the jockey location on the hash table array
+    if(jockeyTable.search(jockeyId)) {
+        jockeyTable.search(jockeyId)->data.m_location = gameUnion.m_counter;
+    }
     // insert the jockey to the union find -jockey is a game node.
     if (gameUnion.makeSet(gameNode(jockeyId))==nullptr) return StatusType::ALLOCATION_ERROR;
 
     //update the parent of the jockey to be the team
-        gameUnion.m_dynamicArray[jockeyTable.search(jockeyId)->data.m_location]->parent =
-                  gameUnion.m_dynamicArray[teamTable.search(teamId)->data.m_location];
+    gameUnion.m_dynamicArray[jockeyTable.search(jockeyId)->data.m_location]->parent =
+            gameUnion.m_dynamicArray[teamTable.search(teamId)->data.m_location];
 
 
 
@@ -97,19 +97,19 @@ StatusType Plains::update_match(int victoriousJockeyId, int losingJockeyId)
     int losingTeamRecord = losingTeam->data.m_record;
     if(victoriousTeamRecord>=0) {
         teamRecord.remove(victoriousTeamRecord, victoriousTeamId);
-       // std::cout<<"------- flag 1, winning record is: "<< victoriousTeam->data.m_record<< std::endl;
+        // std::cout<<"------- flag 1, winning record is: "<< victoriousTeam->data.m_record<< std::endl;
     }
     else {
         teamRecordNeg.remove(-victoriousTeamRecord, victoriousTeamId);
-       // std::cout<<" flag 2"<<std::endl;
+        // std::cout<<" flag 2"<<std::endl;
     }
     if(losingTeamRecord>=0) {
         teamRecord.remove(losingTeamRecord, losingTeamId);
-      //  std::cout<<" ------flag 3, the record is: "<< losingTeam->data.m_record<< std::endl;
+        //  std::cout<<" ------flag 3, the record is: "<< losingTeam->data.m_record<< std::endl;
     }
     else {
         teamRecordNeg.remove(-losingTeamRecord, losingTeamId);
-       // std::cout<<" flag 4"<<std::endl;
+        // std::cout<<" flag 4"<<std::endl;
     }
 
     // update the records of the jockeys
@@ -126,13 +126,13 @@ StatusType Plains::update_match(int victoriousJockeyId, int losingJockeyId)
     //update the team records in the team hash table+ // update the team record hash table
     teamTable.search(victoriousTeamId)->data.m_record++;
     victoriousTeamRecord = teamTable.search(victoriousTeamId)->data.m_record;
-   // std::cout<<"-------victorious team id: "<<victoriousTeamId<<std::endl;
- //   std::cout<<"-------victorious team record: "<<victoriousTeamRecord<<std::endl;
+    // std::cout<<"-------victorious team id: "<<victoriousTeamId<<std::endl;
+    //   std::cout<<"-------victorious team record: "<<victoriousTeamRecord<<std::endl;
 
     teamTable.search(losingTeamId)->data.m_record--;
     losingTeamRecord = teamTable.search(losingTeamId)->data.m_record;
- //   std::cout<<"-------losing team id: "<<losingTeamId<<std::endl;
-  //  std::cout<<"-------losing team record: "<<losingTeamRecord<<std::endl;
+    //   std::cout<<"-------losing team id: "<<losingTeamId<<std::endl;
+    //  std::cout<<"-------losing team record: "<<losingTeamRecord<<std::endl;
 
     if(victoriousTeamRecord>=0) {
         teamRecord.insert(victoriousTeamRecord, victoriousTeamId);
@@ -140,7 +140,7 @@ StatusType Plains::update_match(int victoriousJockeyId, int losingJockeyId)
     else {
         teamRecordNeg.insert(-victoriousTeamRecord, victoriousTeamId);
     }
-  //  teamRecord.insert(victoriousTeam->data.m_record,victoriousTeam->data.m_Id);
+    //  teamRecord.insert(victoriousTeam->data.m_record,victoriousTeam->data.m_Id);
     if(losingTeamRecord>=0) {
         teamRecord.insert(losingTeamRecord, losingTeamId);
     }
@@ -182,15 +182,15 @@ StatusType Plains::merge_teams(int teamId1, int teamId2)
     }
 
     // delete the records of the teams from the team record hash table
-        if (team2->data.m_record >= 0)
-            teamRecord.remove(team2->data.m_record, team2->data.m_Id);
-        else
-            teamRecordNeg.remove(-(team2->data.m_record), team2->data.m_Id);
-        //teamRecord.remove(team2->data.m_record,team2->data.m_Id);
-        if (team1->data.m_record >= 0)
-            teamRecord.remove(team1->data.m_record, team1->data.m_Id);
-        else
-            teamRecordNeg.remove(-(team1->data.m_record), team1->data.m_Id);
+    if (team2->data.m_record >= 0)
+        teamRecord.remove(team2->data.m_record, team2->data.m_Id);
+    else
+        teamRecordNeg.remove(-(team2->data.m_record), team2->data.m_Id);
+    //teamRecord.remove(team2->data.m_record,team2->data.m_Id);
+    if (team1->data.m_record >= 0)
+        teamRecord.remove(team1->data.m_record, team1->data.m_Id);
+    else
+        teamRecordNeg.remove(-(team1->data.m_record), team1->data.m_Id);
 
 
     // if they have the same record the id of the first team will be the new team id
@@ -268,7 +268,7 @@ output_t<int> Plains::get_jockey_record(int jockeyId)
     auto jockey = jockeyTable.search(jockeyId);
     if(jockey == nullptr)
         return StatusType::FAILURE;
-     int record = jockey->data.m_record;
+    int record = jockey->data.m_record;
     return output_t<int>(record);
 }
 
