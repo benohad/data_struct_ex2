@@ -49,9 +49,9 @@ template <class T>
 StatusType HashTable<T>::insert(int key, T data) {
     // Check if the array needs to be resized =>> alpha factor is 2.
     try{
-    if (m_counter >= 7000*m_tableSize) {
-        return arrayResize();
-    }
+        if (m_counter >= 7000*m_tableSize) {
+            return arrayResize();
+        }
     } catch (std::bad_alloc&) {
         return StatusType::ALLOCATION_ERROR;
     }
@@ -78,20 +78,31 @@ StatusType HashTable<T>::insert(int key, T data) {
 template <class T>
 StatusType HashTable<T>::arrayResize() {
     try {
-        // Allocate new array of unique_ptrs with double size.
-        std::unique_ptr<std::shared_ptr<HashNode<T>>[]>
-                newArray(new std::shared_ptr<HashNode<T>>[m_tableSize * 2]);
+        // 1) Keep old array and size.
+        auto oldArray = std::move(m_dynamicArray);
+        int oldSize = m_tableSize;
 
-        // Move the old array to the new array.
-        for (int i = 0; i < m_tableSize; i++) {
-            newArray[i] = m_dynamicArray[i];
-        }
-
-        // Move the new array to m_dynamicArray.
-        m_dynamicArray = std::move(newArray);
-
-        // Update the array size.
+        // 2) Double m_tableSize and allocate new array.
         m_tableSize *= 2;
+        m_dynamicArray.reset(new std::shared_ptr<HashNode<T>>[m_tableSize]);
+
+        // 3) Re-insert all nodes into new array.
+        for (int i = 0; i < oldSize; i++) {
+            std::shared_ptr<HashNode<T>> current = oldArray[i];
+            while (current != nullptr) {
+                // Save 'next' before we overwrite current->next.
+                std::shared_ptr<HashNode<T>> nextNode = current->next;
+
+                // Compute new index with updated m_tableSize:
+                int newIndex = hashFunction(current->key);
+
+                // Insert at head of new chain:
+                current->next = m_dynamicArray[newIndex];
+                m_dynamicArray[newIndex] = current;
+
+                current = nextNode;
+            }
+        }
 
         return StatusType::SUCCESS;
     } catch (std::bad_alloc&) {
@@ -149,15 +160,59 @@ std::shared_ptr<HashNode<T>> HashTable<T>::search(int key) {
     return nullptr;
 }
 
-template <class T>
+/*template <class T>
 bool HashTable<T>:: Singleton(int key){
     int index = hashFunction(key);
     std::shared_ptr<HashNode<T>> current = m_dynamicArray[index];
+
+    if(current->key == key && current->next == nullptr){
+        return true;
+    }
+    // if there is a next node with the same key
+
+    while (current->next != nullptr) {
+        if(current->key == key && current->next != nullptr){
+            if(current->next->key == key){
+                return false;
+            }
+        }
+        current = current->next;
+    }
+   *//* if(current->key == key && current->next != nullptr){
+        if(current->next->key != key){
+            return true;
+        }
+    }*//*
+    return true;
+}*/
+
+template <class T>
+bool HashTable<T>::Singleton(int key) {
+    int index = hashFunction(key);
+    std::shared_ptr<HashNode<T>> current = m_dynamicArray[index];
+
+    // If the index is empty, the key is not present.
     if (current == nullptr) {
         return false;
     }
-    return current->next == nullptr;
+
+    // Check the chain for the key.
+    bool found = false;
+    while (current != nullptr) {
+        if (current->key == key) {
+            if (found) {
+                // If we find the key again, it's not a singleton.
+                return false;
+            }
+            found = true; // First occurrence of the key.
+        }
+        current = current->next;
+    }
+
+    // If the key was found only once, it's a singleton.
+    return found;
 }
+
 
 
 
